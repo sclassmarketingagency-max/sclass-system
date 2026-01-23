@@ -306,15 +306,21 @@
     }
 
     async function postToMake(payload){
-      // IMPORTANT: no headers -> browser sends text/plain, avoids CORS preflight in many cases.
-      const res = await fetch(MAKE_WEBHOOK_URL, {
-        method: "POST",
-        body: JSON.stringify(payload)
-      });
-      const text = await res.text();
-      // try parse json, else return raw
-      try { return JSON.parse(text); } catch { return { ok:false, raw:text }; }
-    }
+  const res = await fetch(MAKE_WEBHOOK_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(payload)
+  });
+
+  const text = await res.text();
+  try {
+    return JSON.parse(text);
+  } catch {
+    return { ok:false, raw:text };
+  }
+}
 
     // Clear
     document.getElementById('clearBtn').addEventListener('click', () => {
