@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -8,12 +8,12 @@
 
   <style>
     :root{
-      --bg:#0f1f1c;
-      --card:#1c2f2b;
-      --field:#152824;
+      --bg:#003e41;        /* Rich Black */
+      --card:#0b4f52;
+      --field:#063a3d;
       --text:#f2f2f2;
       --muted:rgba(242,242,242,.7);
-      --accent:#ecd4bd; /* фирменный бежевый */
+      --accent:#ecd4bd;    /* фирменный бежевый */
       --danger:#ff6b6b;
       --ok:#7CFF9A;
     }
@@ -23,262 +23,116 @@
     .topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
     h1{font-size:22px;margin:0 0 6px;}
     .subtitle{font-size:13px;color:var(--muted);margin:0 0 14px;}
-    .pill{font-size:12px;padding:6px 10px;border-radius:999px;background:rgba(236,212,189,.12);color:var(--accent);}
+    .pill{font-size:12px;padding:6px 10px;border-radius:999px;background:rgba(236,212,189,.15);color:var(--accent);}
     label{display:block;font-size:13px;margin:14px 0 6px;color:var(--muted);}
-    input, textarea{
+    input{
       width:100%;padding:12px;border-radius:10px;border:none;
       font-size:15px;background:var(--field);color:var(--text);box-sizing:border-box;outline:none;
     }
-    textarea{resize:vertical;min-height:90px;}
-    .row{display:flex;gap:10px;align-items:center;}
-    .row > *{flex:1;}
+    .row{display:flex;gap:10px;}
     .btn{
       width:100%;padding:14px;border-radius:12px;border:none;
       font-size:16px;font-weight:800;background:var(--accent);color:var(--bg);cursor:pointer;margin-top:14px;
     }
-    .btn-secondary{
-      width:100%;padding:12px;border-radius:12px;border:1px solid rgba(236,212,189,.35);
-      font-size:14px;font-weight:700;background:transparent;color:var(--accent);cursor:pointer;margin-top:10px;
-    }
     .btn-mini{
-      padding:12px;border-radius:12px;border:1px solid rgba(236,212,189,.35);
+      flex:1;padding:12px;border-radius:12px;border:1px solid rgba(236,212,189,.35);
       font-size:14px;font-weight:700;background:transparent;color:var(--accent);cursor:pointer;
     }
     .status{margin-top:12px;font-size:13px;text-align:center;color:var(--muted);}
     .status.error{color:var(--danger);}
     .status.ok{color:var(--ok);}
-    .hide{display:none;}
-    .hint{font-size:12px;color:var(--muted);margin-top:8px;line-height:1.35;}
-    .code{letter-spacing:6px;font-weight:800;text-align:center;font-size:18px;}
+    .hint{font-size:12px;color:var(--muted);margin-top:8px;}
+    .code{text-align:center;letter-spacing:6px;font-size:18px;font-weight:800;}
   </style>
 </head>
 
 <body>
-  <div class="container">
-
-    <!-- LOGIN (EMAIL + OTP) -->
-    <div id="loginView" class="card">
-      <div class="topbar">
-        <div>
-          <h1>Sign in</h1>
-          <div class="subtitle">S-Class internal system</div>
-        </div>
-        <div class="pill">Email OTP</div>
+<div class="container">
+  <div class="card">
+    <div class="topbar">
+      <div>
+        <h1 id="t_title"></h1>
+        <div class="subtitle" id="t_subtitle"></div>
       </div>
-
-      <label>Work email</label>
-      <input id="email" type="email" placeholder="name@company.com" autocomplete="email" />
-
-      <div class="row" style="margin-top:12px;">
-        <button class="btn-mini" onclick="requestCode()">Send code</button>
-        <button class="btn-mini" onclick="clearOtp()">Clear</button>
-      </div>
-
-      <div class="hint">We’ll send a 6-digit code to your email. Code is valid for ~10 minutes.</div>
-
-      <label style="margin-top:18px;">6-digit code</label>
-      <input id="code" inputmode="numeric" maxlength="6" placeholder="••••••" class="code" />
-
-      <button class="btn" onclick="verifyCode()">Verify & Open</button>
-
-      <div id="loginStatus" class="status"></div>
+      <div class="pill">Email OTP</div>
     </div>
 
-    <!-- APP -->
-    <div id="appView" class="card hide">
-      <div class="topbar">
-        <div>
-          <h1>Create Project</h1>
-          <div class="subtitle">Access granted</div>
-        </div>
-        <div id="rolePill" class="pill">role</div>
-      </div>
+    <label id="t_email_label"></label>
+    <input id="email" type="email" placeholder="name@company.com"/>
 
-      <label>Project name</label>
-      <input id="projectName" placeholder="e.g. 4D Opalubka" />
-
-      <label>Client</label>
-      <input id="clientName" placeholder="Company / brand" />
-
-      <label>Deadline</label>
-      <input id="deadline" type="date" />
-
-      <label>Project brief</label>
-      <textarea id="brief" placeholder="Short description of the task"></textarea>
-
-      <button class="btn" onclick="submitProject()">Create project</button>
-      <button class="btn-secondary" onclick="logout()">Logout</button>
-
-      <div id="appStatus" class="status"></div>
+    <div class="row" style="margin-top:12px;">
+      <button class="btn-mini" onclick="requestCode()" id="t_send"></button>
+      <button class="btn-mini" onclick="clearCode()" id="t_clear"></button>
     </div>
 
+    <div class="hint" id="t_hint"></div>
+
+    <label id="t_code_label"></label>
+    <input id="code" maxlength="6" class="code" placeholder="••••••"/>
+
+    <button class="btn" onclick="verifyCode()" id="t_verify"></button>
+    <div id="status" class="status"></div>
   </div>
+</div>
 
-  <script>
-    const tg = window.Telegram.WebApp;
-    tg.expand();
+<script>
+const tg = window.Telegram.WebApp;
+tg.expand();
 
-    // ✅ ВСТАВЬ СЮДА Make.com Custom Webhook URL (один, с action=request_otp/verify_otp/create_project)
-    const MAKE_WEBHOOK_URL = "PASTE_MAKE_WEBHOOK_URL_HERE";
+const LANG = (tg.initDataUnsafe?.user?.language_code || "en").startsWith("ru")
+  ? "ru"
+  : (tg.initDataUnsafe?.user?.language_code || "").startsWith("uz")
+    ? "uz"
+    : "en";
 
-    function setStatus(el, text, type=""){
-      el.textContent = text;
-      el.classList.remove("error","ok");
-      if(type) el.classList.add(type);
-    }
+const TEXT = {
+  en:{
+    title:"Sign in",
+    subtitle:"S-Class internal system",
+    email:"Work email",
+    send:"Send code",
+    clear:"Clear",
+    hint:"We’ll send a 6-digit code to your email. Code is valid for ~10 minutes.",
+    code:"6-digit code",
+    verify:"Verify & Open"
+  },
+  ru:{
+    title:"Вход",
+    subtitle:"Внутренняя система S-Class",
+    email:"Рабочая почта",
+    send:"Отправить код",
+    clear:"Очистить",
+    hint:"Мы отправим 6-значный код на почту. Код действует ~10 минут.",
+    code:"6-значный код",
+    verify:"Проверить и войти"
+  },
+  uz:{
+    title:"Kirish",
+    subtitle:"S-Class ichki tizimi",
+    email:"Ishchi pochta",
+    send:"Kod yuborish",
+    clear:"Tozalash",
+    hint:"Elektron pochtangizga 6 xonali kod yuboramiz. Kod ~10 daqiqa amal qiladi.",
+    code:"6 xonali kod",
+    verify:"Tasdiqlash va ochish"
+  }
+};
 
-    function showApp(role){
-      document.getElementById("loginView").classList.add("hide");
-      document.getElementById("appView").classList.remove("hide");
-      document.getElementById("rolePill").textContent = role || "member";
-    }
-    function showLogin(){
-      document.getElementById("appView").classList.add("hide");
-      document.getElementById("loginView").classList.remove("hide");
-    }
+function t(id,key){ document.getElementById(id).innerText = TEXT[LANG][key]; }
 
-    function clearOtp(){
-      document.getElementById("code").value = "";
-      setStatus(document.getElementById("loginStatus"), "");
-    }
+t("t_title","title");
+t("t_subtitle","subtitle");
+t("t_email_label","email");
+t("t_send","send");
+t("t_clear","clear");
+t("t_hint","hint");
+t("t_code_label","code");
+t("t_verify","verify");
 
-    function getEmail(){
-      return (document.getElementById("email").value || "").trim().toLowerCase();
-    }
-
-    async function postToMake(payload){
-      if(!MAKE_WEBHOOK_URL || MAKE_WEBHOOK_URL.includes("PASTE_")){
-        throw new Error("Make webhook not configured");
-      }
-      const res = await fetch(MAKE_WEBHOOK_URL, {
-        method:"POST",
-        headers:{ "Content-Type":"application/json" },
-        body: JSON.stringify(payload)
-      });
-      return await res.json();
-    }
-
-    async function requestCode(){
-      const statusEl = document.getElementById("loginStatus");
-      const email = getEmail();
-      if(!email){
-        setStatus(statusEl, "Enter your work email.", "error");
-        return;
-      }
-      setStatus(statusEl, "Sending code...");
-      try{
-        const data = await postToMake({
-          action: "request_otp",
-          email,
-          tg_user: tg.initDataUnsafe?.user || {},
-          initData: tg.initData
-        });
-
-        if(data?.ok){
-          setStatus(statusEl, "Code sent ✅ Check your email.", "ok");
-          tg.HapticFeedback.notificationOccurred("success");
-        } else {
-          setStatus(statusEl, data?.error || "Access denied.", "error");
-          tg.HapticFeedback.notificationOccurred("error");
-        }
-      }catch(e){
-        setStatus(statusEl, e.message.includes("configured") ? "Webhook not configured yet." : "Network error. Try again.", "error");
-      }
-    }
-
-    async function verifyCode(){
-      const statusEl = document.getElementById("loginStatus");
-      const email = getEmail();
-      const code = (document.getElementById("code").value || "").trim();
-
-      if(!email){
-        setStatus(statusEl, "Enter your work email.", "error");
-        return;
-      }
-      if(!/^\d{6}$/.test(code)){
-        setStatus(statusEl, "Enter the 6-digit code.", "error");
-        return;
-      }
-
-      setStatus(statusEl, "Verifying...");
-      try{
-        const data = await postToMake({
-          action: "verify_otp",
-          email,
-          code,
-          tg_user: tg.initDataUnsafe?.user || {},
-          initData: tg.initData
-        });
-
-        if(data?.ok){
-          localStorage.setItem("sclass_session", JSON.stringify({
-            ok:true,
-            email,
-            role:data.role || "member",
-            ts: Date.now()
-          }));
-          setStatus(statusEl, "Access granted ✅", "ok");
-          tg.HapticFeedback.notificationOccurred("success");
-          showApp(data.role);
-        } else {
-          setStatus(statusEl, data?.error || "Invalid or expired code.", "error");
-          tg.HapticFeedback.notificationOccurred("error");
-        }
-      }catch(e){
-        setStatus(statusEl, "Network error. Try again.", "error");
-      }
-    }
-
-    function logout(){
-      localStorage.removeItem("sclass_session");
-      showLogin();
-      tg.HapticFeedback.notificationOccurred("warning");
-    }
-
-    async function submitProject(){
-      const statusEl = document.getElementById("appStatus");
-      setStatus(statusEl, "Sending...");
-
-      const session = JSON.parse(localStorage.getItem("sclass_session") || "null");
-      if(!session?.ok){
-        setStatus(statusEl, "Session expired. Please sign in again.", "error");
-        showLogin();
-        return;
-      }
-
-      const payload = {
-        action: "create_project",
-        project_name: (document.getElementById("projectName").value || "").trim(),
-        client: (document.getElementById("clientName").value || "").trim(),
-        deadline: document.getElementById("deadline").value,
-        brief: (document.getElementById("brief").value || "").trim(),
-        email: session.email,
-        role: session.role,
-        tg_user: tg.initDataUnsafe?.user || {},
-        initData: tg.initData
-      };
-
-      try{
-        const data = await postToMake(payload);
-        if(data?.ok){
-          setStatus(statusEl, `Created ✅ ${data.project_id || ""}`, "ok");
-          tg.HapticFeedback.notificationOccurred("success");
-        } else {
-          setStatus(statusEl, data?.error || "Failed to create project.", "error");
-          tg.HapticFeedback.notificationOccurred("error");
-        }
-      }catch(e){
-        setStatus(statusEl, "Network error. Try again.", "error");
-      }
-    }
-
-    // Auto-open if session exists
-    (function init(){
-      const session = JSON.parse(localStorage.getItem("sclass_session") || "null");
-      if(session?.ok){
-        showApp(session.role);
-      }
-    })();
-  </script>
+// логика Make.com подключается дальше
+function requestCode(){ document.getElementById("status").innerText="→ Make.com"; }
+function verifyCode(){ document.getElementById("status").innerText="→ Make.com"; }
+function clearCode(){ document.getElementById("code").value=""; }
+</script>
 </body>
 </html>
