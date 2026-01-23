@@ -1,324 +1,313 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="ru">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <title>S-Class System</title>
+
+  <!-- Telegram WebApp SDK -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
   <style>
     :root{
-      --bg:#003e41;        /* Rich Black (brand) */
-      --card:#0b4f52;
-      --field:#063a3d;
+      /* Brand */
+      --rich-black:#003e41;      /* main */
+      --deep:#031b1e;            /* darker */
+      --teal:#005151;            /* accent */
+      --beige:#ecd4bd;           /* primary button */
+      --beige-2:#e6c7aa;         /* hover/active */
       --text:#f2f2f2;
-      --muted:rgba(242,242,242,.70);
-      --accent:#ecd4bd;    /* Dutch White (brand) */
-      --accent2:rgba(236,212,189,.16);
-      --border:rgba(236,212,189,.35);
-      --danger:#ff6b6b;
-      --ok:#7CFF9A;
-    }
-    body{
-      margin:0;
-      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,sans-serif;
-      background:var(--bg);
-      color:var(--text);
-    }
-    .container{padding:20px;max-width:520px;margin:0 auto;}
-    .card{background:var(--card);border-radius:18px;padding:16px;box-shadow:0 10px 30px rgba(0,0,0,.18);}
-    .topbar{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:10px;}
-    h1{font-size:22px;margin:0 0 6px;line-height:1.1;}
-    .subtitle{font-size:13px;color:var(--muted);margin:0;}
-    .pill{font-size:12px;padding:6px 10px;border-radius:999px;background:var(--accent2);color:var(--accent);white-space:nowrap;}
-    .langbar{display:flex;gap:8px;margin:10px 0 14px;}
-    .langbtn{
-      flex:1;
-      padding:10px 10px;
-      border-radius:12px;
-      border:1px solid var(--border);
-      background:transparent;
-      color:var(--accent);
-      font-weight:800;
-      font-size:13px;
-      cursor:pointer;
-    }
-    .langbtn.active{
-      background:var(--accent);
-      color:var(--bg);
-      border-color:transparent;
+      --muted:rgba(255,255,255,.72);
+      --stroke:rgba(255,255,255,.16);
+      --card:rgba(3,27,30,.25);
+      --input:rgba(3,27,30,.45);
+      --shadow: 0 14px 40px rgba(0,0,0,.35);
+      --radius:18px;
     }
 
-    label{display:block;font-size:13px;margin:14px 0 6px;color:var(--muted);}
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,Arial,"Apple Color Emoji","Segoe UI Emoji";
+      color:var(--text);
+      background:
+        radial-gradient(1200px 700px at 20% 0%, rgba(236,212,189,.10), transparent 60%),
+        radial-gradient(900px 600px at 80% 20%, rgba(0,81,81,.20), transparent 55%),
+        linear-gradient(180deg, var(--rich-black), var(--deep));
+      min-height:100vh;
+      display:flex;
+      align-items:flex-start;
+      justify-content:center;
+      padding:22px 14px;
+    }
+
+    .wrap{
+      width:100%;
+      max-width:520px;
+    }
+
+    .card{
+      background: linear-gradient(180deg, rgba(0,62,65,.55), rgba(3,27,30,.45));
+      border:1px solid var(--stroke);
+      border-radius: 22px;
+      box-shadow: var(--shadow);
+      padding:18px 18px 16px;
+      backdrop-filter: blur(10px);
+    }
+
+    .toprow{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:10px;
+    }
+
+    h1{
+      margin:0;
+      font-size:34px;
+      letter-spacing:.2px;
+      line-height:1.05;
+    }
+
+    .sub{
+      margin-top:6px;
+      color:var(--muted);
+      font-size:14px;
+    }
+
+    .badge{
+      margin-top:3px;
+      padding:8px 12px;
+      border-radius:999px;
+      border:1px solid var(--stroke);
+      background: rgba(3,27,30,.35);
+      color:rgba(255,255,255,.85);
+      font-size:12px;
+      white-space:nowrap;
+      user-select:none;
+    }
+
+    .langs{
+      display:flex;
+      gap:10px;
+      margin:14px 0 18px;
+    }
+
+    .langbtn{
+      flex:1;
+      height:44px;
+      border-radius:14px;
+      border:1px solid var(--stroke);
+      background: rgba(3,27,30,.35);
+      color:rgba(255,255,255,.88);
+      font-weight:700;
+      letter-spacing:.6px;
+    }
+    .langbtn.active{
+      background: var(--beige);
+      border-color: rgba(236,212,189,.55);
+      color: #142b2c;
+    }
+
+    label{
+      display:block;
+      color:rgba(255,255,255,.86);
+      font-size:14px;
+      margin:0 0 10px;
+    }
+
     input{
       width:100%;
-      padding:12px;
-      border-radius:12px;
-      border:none;
-      font-size:15px;
-      background:var(--field);
-      color:var(--text);
-      box-sizing:border-box;
+      height:52px;
+      border-radius:16px;
+      border:1px solid var(--stroke);
+      background: var(--input);
+      color: var(--text);
+      padding:0 16px;
       outline:none;
-    }
-    .row{display:flex;gap:10px;margin-top:12px;}
-    .btn-mini{
-      flex:1;
-      padding:12px;
-      border-radius:12px;
-      border:1px solid var(--border);
-      font-size:14px;
-      font-weight:800;
-      background:transparent;
-      color:var(--accent);
-      cursor:pointer;
-    }
-    .btn{
-      width:100%;
-      padding:14px;
-      border-radius:14px;
-      border:none;
       font-size:16px;
-      font-weight:900;
-      background:var(--accent);
-      color:var(--bg);
-      cursor:pointer;
-      margin-top:14px;
     }
-    .hint{font-size:12px;color:var(--muted);margin-top:8px;}
-    .code{text-align:center;letter-spacing:6px;font-size:18px;font-weight:900;}
-    .status{margin-top:12px;font-size:13px;text-align:center;color:var(--muted);}
-    .status.error{color:var(--danger);}
-    .status.ok{color:var(--ok);}
+    input::placeholder{ color:rgba(255,255,255,.45); }
+
+    .row{
+      display:flex;
+      gap:12px;
+      margin:14px 0 10px;
+    }
+
+    .btn{
+      flex:1;
+      height:50px;
+      border-radius:16px;
+      border:1px solid var(--stroke);
+      background: rgba(3,27,30,.35);
+      color: rgba(255,255,255,.9);
+      font-weight:700;
+      font-size:16px;
+    }
+
+    .btn.primary{
+      background: var(--beige);
+      border-color: rgba(236,212,189,.55);
+      color:#142b2c;
+    }
+    .btn.primary:active{ background: var(--beige-2); }
+
+    .hint{
+      color: rgba(255,255,255,.70);
+      font-size:13px;
+      margin:10px 2px 14px;
+      line-height:1.35;
+    }
+
+    .verify{
+      width:100%;
+      height:58px;
+      border-radius:18px;
+      border:1px solid rgba(236,212,189,.55);
+      background: var(--beige);
+      color:#142b2c;
+      font-weight:900;
+      font-size:18px;
+      letter-spacing:.2px;
+      margin-top:10px;
+    }
+    .verify:active{ background: var(--beige-2); }
+
+    /* no bottom status area at all */
+    .hidden{display:none!important}
   </style>
 </head>
 
 <body>
-  <div class="container">
+  <div class="wrap">
     <div class="card">
-      <div class="topbar">
+      <div class="toprow">
         <div>
-          <h1 id="t_title">Sign in</h1>
-          <p class="subtitle" id="t_subtitle">S-Class internal system</p>
+          <h1 id="t_title">Kirish</h1>
+          <div class="sub" id="t_sub">S-Class ichki tizimi</div>
         </div>
-        <div class="pill" id="t_pill">Email OTP</div>
+        <div class="badge">Email OTP</div>
       </div>
 
-      <!-- Language selector (TOP) — ORDER: UZ, EN, RU -->
-      <div class="langbar" aria-label="Language">
-        <button id="btn_uz" class="langbtn" onclick="setLang('uz')">UZ</button>
-        <button id="btn_en" class="langbtn" onclick="setLang('en')">EN</button>
-        <button id="btn_ru" class="langbtn" onclick="setLang('ru')">RU</button>
+      <!-- Language: сверху UZ, потом EN, потом RU -->
+      <div class="langs" role="tablist" aria-label="Language">
+        <button class="langbtn active" id="btnUZ" type="button">UZ</button>
+        <button class="langbtn" id="btnEN" type="button">EN</button>
+        <button class="langbtn" id="btnRU" type="button">RU</button>
       </div>
 
-      <label id="t_email_label">Work email</label>
-      <input id="email" type="email" placeholder="name@company.com" autocomplete="email"/>
+      <label id="t_email_label" for="email">Ishchi pochta</label>
+      <input id="email" type="email" placeholder="name@company.com" autocomplete="email" inputmode="email" />
 
       <div class="row">
-        <button class="btn-mini" id="t_send" onclick="requestCode()">Send code</button>
-        <button class="btn-mini" id="t_clear" onclick="clearAll()">Clear</button>
+        <button class="btn" id="sendBtn" type="button">Kod yuborish</button>
+        <button class="btn" id="clearBtn" type="button">Tozalash</button>
       </div>
 
-      <div class="hint" id="t_hint">We’ll send a 6-digit code to your email. Code is valid for ~10 minutes.</div>
+      <div class="hint" id="t_hint">
+        Elektron pochtangizga 6 xonali kod yuboramiz. Kod ~10 daqiqa amal qiladi.
+      </div>
 
-      <label id="t_code_label">6-digit code</label>
-      <input id="code" maxlength="6" class="code" inputmode="numeric" placeholder="••••••"/>
+      <label id="t_code_label" for="code">6 xonali kod</label>
+      <input id="code" type="text" placeholder="••••••" maxlength="6" inputmode="numeric" />
 
-      <button class="btn" id="t_verify" onclick="verifyCode()">Verify & Open</button>
-
-      <div id="status" class="status"></div>
+      <button class="verify" id="verifyBtn" type="button">Tasdiqlash va ochish</button>
     </div>
   </div>
 
-<script>
-  const tg = window.Telegram?.WebApp;
-  if (tg) tg.expand();
-
-  // ====== TEXTS (UZ / EN / RU) ======
-  const TEXT = {
-    uz:{
-      title:"Kirish",
-      subtitle:"S-Class ichki tizimi",
-      pill:"Email OTP",
-      email:"Ishchi pochta",
-      send:"Kod yuborish",
-      clear:"Tozalash",
-      hint:"Elektron pochtangizga 6 xonali kod yuboramiz. Kod ~10 daqiqa amal qiladi.",
-      code:"6 xonali kod",
-      verify:"Tasdiqlash va ochish",
-      sending:"Kod yuborilmoqda...",
-      verifying:"Tekshirilmoqda...",
-      enterEmail:"Iltimos, email kiriting.",
-      enterCode:"Iltimos, 6 xonali kodni kiriting."
-    },
-    en:{
-      title:"Sign in",
-      subtitle:"S-Class internal system",
-      pill:"Email OTP",
-      email:"Work email",
-      send:"Send code",
-      clear:"Clear",
-      hint:"We’ll send a 6-digit code to your email. Code is valid for ~10 minutes.",
-      code:"6-digit code",
-      verify:"Verify & Open",
-      sending:"Sending code...",
-      verifying:"Verifying...",
-      enterEmail:"Please enter your email.",
-      enterCode:"Please enter the 6-digit code."
-    },
-    ru:{
-      title:"Вход",
-      subtitle:"Внутренняя система S-Class",
-      pill:"Email OTP",
-      email:"Рабочая почта",
-      send:"Отправить код",
-      clear:"Очистить",
-      hint:"Мы отправим 6-значный код на почту. Код действует ~10 минут.",
-      code:"6-значный код",
-      verify:"Проверить и войти",
-      sending:"Отправляем код...",
-      verifying:"Проверяем...",
-      enterEmail:"Введите email.",
-      enterCode:"Введите 6-значный код."
-    }
-  };
-
-  // ====== Language logic ======
-  function detectLang(){
-    // 1) saved choice
-    const saved = localStorage.getItem("sclass_lang");
-    if (saved && TEXT[saved]) return saved;
-
-    // 2) telegram language
-    const lc = (tg?.initDataUnsafe?.user?.language_code || "").toLowerCase();
-    if (lc.startsWith("uz")) return "uz";
-    if (lc.startsWith("ru")) return "ru";
-    return "en";
-  }
-
-  let LANG = detectLang();
-
-  function setLang(lang){
-    LANG = lang;
-    localStorage.setItem("sclass_lang", lang);
-    render();
-  }
-
-  function render(){
-    const T = TEXT[LANG] || TEXT.en;
-
-    document.getElementById("t_title").innerText = T.title;
-    document.getElementById("t_subtitle").innerText = T.subtitle;
-    document.getElementById("t_pill").innerText = T.pill;
-
-    document.getElementById("t_email_label").innerText = T.email;
-    document.getElementById("t_send").innerText = T.send;
-    document.getElementById("t_clear").innerText = T.clear;
-    document.getElementById("t_hint").innerText = T.hint;
-    document.getElementById("t_code_label").innerText = T.code;
-    document.getElementById("t_verify").innerText = T.verify;
-
-    // active buttons (ORDER stays UZ, EN, RU)
-    document.getElementById("btn_uz").classList.toggle("active", LANG==="uz");
-    document.getElementById("btn_en").classList.toggle("active", LANG==="en");
-    document.getElementById("btn_ru").classList.toggle("active", LANG==="ru");
-  }
-
-  render();
-
-  // ====== STATUS helpers ======
-  function setStatus(msg, type=""){
-    const el = document.getElementById("status");
-    el.className = "status" + (type ? " " + type : "");
-    el.innerText = msg || "";
-  }
-
-  function clearAll(){
-    document.getElementById("email").value = "";
-    document.getElementById("code").value = "";
-    setStatus("");
-  }
-
-  // ====== BACKEND placeholders (Make.com) ======
-  // Пока Make.com не подключен — это заглушки.
-  // Потом сюда вставим реальный URL webhook.
-  const MAKE_WEBHOOK_URL = ""; // <-- позже вставим
-
-  async function requestCode(){
-    const T = TEXT[LANG] || TEXT.en;
-    const email = (document.getElementById("email").value || "").trim().toLowerCase();
-    if (!email){
-      setStatus(T.enterEmail, "error");
-      return;
+  <script>
+    // Telegram init
+    const tg = window.Telegram?.WebApp;
+    if (tg) {
+      tg.expand();
+      tg.setHeaderColor?.('#003e41');
+      tg.setBackgroundColor?.('#003e41');
     }
 
-    setStatus(T.sending);
-
-    // Заглушка, пока не подключён Make.com
-    if (!MAKE_WEBHOOK_URL){
-      setStatus("✅ UI ready. Connect Make.com webhook to send real emails.", "ok");
-      return;
-    }
-
-    try{
-      const res = await fetch(MAKE_WEBHOOK_URL, {
-        method:"POST",
-        headers:{ "Content-Type":"application/json" },
-        body: JSON.stringify({
-          action:"request_otp",
-          email,
-          tg_user_id: tg?.initDataUnsafe?.user?.id || null
-        })
-      });
-      const data = await res.json();
-      if (data?.ok){
-        setStatus("✅ Code sent", "ok");
-      }else{
-        setStatus(data?.error || "❌ Access denied", "error");
+    // i18n dictionary
+    const I18N = {
+      UZ: {
+        title: "Kirish",
+        sub: "S-Class ichki tizimi",
+        emailLabel: "Ishchi pochta",
+        send: "Kod yuborish",
+        clear: "Tozalash",
+        hint: "Elektron pochtangizga 6 xonali kod yuboramiz. Kod ~10 daqiqa amal qiladi.",
+        codeLabel: "6 xonali kod",
+        verify: "Tasdiqlash va ochish",
+        emailPh: "name@company.com"
+      },
+      EN: {
+        title: "Sign in",
+        sub: "S-Class internal system",
+        emailLabel: "Work email",
+        send: "Send code",
+        clear: "Clear",
+        hint: "We’ll send a 6-digit code to your email. Code is valid for ~10 minutes.",
+        codeLabel: "6-digit code",
+        verify: "Verify & Open",
+        emailPh: "name@company.com"
+      },
+      RU: {
+        title: "Вход",
+        sub: "Внутренняя система S-Class",
+        emailLabel: "Рабочая почта",
+        send: "Отправить код",
+        clear: "Очистить",
+        hint: "Мы отправим 6-значный код на вашу почту. Код действует ~10 минут.",
+        codeLabel: "6-значный код",
+        verify: "Проверить и открыть",
+        emailPh: "name@company.com"
       }
-    }catch(e){
-      setStatus("❌ Network error", "error");
+    };
+
+    let lang = "UZ";
+
+    function setLang(newLang){
+      lang = newLang;
+      // active button
+      document.getElementById('btnUZ').classList.toggle('active', lang === 'UZ');
+      document.getElementById('btnEN').classList.toggle('active', lang === 'EN');
+      document.getElementById('btnRU').classList.toggle('active', lang === 'RU');
+
+      const t = I18N[lang];
+      document.getElementById('t_title').textContent = t.title;
+      document.getElementById('t_sub').textContent = t.sub;
+      document.getElementById('t_email_label').textContent = t.emailLabel;
+      document.getElementById('sendBtn').textContent = t.send;
+      document.getElementById('clearBtn').textContent = t.clear;
+      document.getElementById('t_hint').textContent = t.hint;
+      document.getElementById('t_code_label').textContent = t.codeLabel;
+      document.getElementById('verifyBtn').textContent = t.verify;
+      document.getElementById('email').placeholder = t.emailPh;
     }
-  }
 
-  async function verifyCode(){
-    const T = TEXT[LANG] || TEXT.en;
-    const email = (document.getElementById("email").value || "").trim().toLowerCase();
-    const code = (document.getElementById("code").value || "").trim();
+    // language buttons
+    document.getElementById('btnUZ').addEventListener('click', () => setLang('UZ'));
+    document.getElementById('btnEN').addEventListener('click', () => setLang('EN'));
+    document.getElementById('btnRU').addEventListener('click', () => setLang('RU'));
 
-    if (!email){ setStatus(T.enterEmail, "error"); return; }
-    if (!code || code.length !== 6){ setStatus(T.enterCode, "error"); return; }
+    // UI-only actions (пока без Make.com)
+    document.getElementById('clearBtn').addEventListener('click', () => {
+      document.getElementById('email').value = '';
+      document.getElementById('code').value = '';
+      if (tg) tg.HapticFeedback?.impactOccurred('light');
+    });
 
-    setStatus(T.verifying);
+    document.getElementById('sendBtn').addEventListener('click', () => {
+      // пока заглушка без текста внизу и без алертов
+      if (tg) tg.HapticFeedback?.notificationOccurred('success');
+    });
 
-    // Заглушка, пока не подключён Make.com
-    if (!MAKE_WEBHOOK_URL){
-      setStatus("✅ OTP check will work after Make.com подключим.", "ok");
-      return;
-    }
+    document.getElementById('verifyBtn').addEventListener('click', () => {
+      // пока заглушка без текста внизу и без алертов
+      if (tg) tg.HapticFeedback?.notificationOccurred('success');
+    });
 
-    try{
-      const res = await fetch(MAKE_WEBHOOK_URL, {
-        method:"POST",
-        headers:{ "Content-Type":"application/json" },
-        body: JSON.stringify({
-          action:"verify_otp",
-          email,
-          code,
-          tg_user_id: tg?.initDataUnsafe?.user?.id || null
-        })
-      });
-      const data = await res.json();
-      if (data?.ok){
-        setStatus("✅ Access granted", "ok");
-        // тут позже откроем меню/перекинем на основной экран
-      }else{
-        setStatus(data?.error || "❌ Invalid code", "error");
-      }
-    }catch(e){
-      setStatus("❌ Network error", "error");
-    }
-  }
-</script>
+    // default
+    setLang('UZ');
+  </script>
 </body>
 </html>
