@@ -175,7 +175,6 @@
     }
     .verify:active{ background: var(--beige-2); }
 
-    /* no bottom status area at all */
     .hidden{display:none!important}
   </style>
 </head>
@@ -218,6 +217,9 @@
   </div>
 
   <script>
+    // === CONFIG ===
+    const MAKE_WEBHOOK_URL = "https://hook.eu1.make.com/ttfwxk8ddv8uip6c65f3vff94nazik87";
+
     // Telegram init
     const tg = window.Telegram?.WebApp;
     if (tg) {
@@ -267,7 +269,6 @@
 
     function setLang(newLang){
       lang = newLang;
-      // active button
       document.getElementById('btnUZ').classList.toggle('active', lang === 'UZ');
       document.getElementById('btnEN').classList.toggle('active', lang === 'EN');
       document.getElementById('btnRU').classList.toggle('active', lang === 'RU');
@@ -284,26 +285,99 @@
       document.getElementById('email').placeholder = t.emailPh;
     }
 
-    // language buttons
     document.getElementById('btnUZ').addEventListener('click', () => setLang('UZ'));
     document.getElementById('btnEN').addEventListener('click', () => setLang('EN'));
     document.getElementById('btnRU').addEventListener('click', () => setLang('RU'));
 
-    // UI-only actions (пока без Make.com)
+    // Helpers
+    function haptic(type){
+      if (!tg) return;
+      if (type === 'ok') tg.HapticFeedback?.notificationOccurred('success');
+      if (type === 'err') tg.HapticFeedback?.notificationOccurred('error');
+      if (type === 'tap') tg.HapticFeedback?.impactOccurred('light');
+    }
+
+    function normalizeEmail(v){
+      return (v || "").trim().toLowerCase();
+    }
+
+    function normalizeCode(v){
+      return (v || "").replace(/\D/g,'').slice(0,6);
+    }
+
+    async function postToMake(payload){
+      // IMPORTANT: no headers -> browser sends text/plain, avoids CORS preflight in many cases.
+      const res = await fetch(MAKE_WEBHOOK_URL, {
+        method: "POST",
+        body: JSON.stringify(payload)
+      });
+      const text = await res.text();
+      // try parse json, else return raw
+      try { return JSON.parse(text); } catch { return { ok:false, raw:text }; }
+    }
+
+    // Clear
     document.getElementById('clearBtn').addEventListener('click', () => {
       document.getElementById('email').value = '';
       document.getElementById('code').value = '';
-      if (tg) tg.HapticFeedback?.impactOccurred('light');
+      haptic('tap');
     });
 
-    document.getElementById('sendBtn').addEventListener('click', () => {
-      // пока заглушка без текста внизу и без алертов
-      if (tg) tg.HapticFeedback?.notificationOccurred('success');
+    // Send code -> Make webhook
+    document.getElementById('sendBtn').addEventListener('click', async () => {
+      const email = normalizeEmail(document.getElementById('email').value);
+
+      if (!email || !email.includes('@')) { haptic('err'); return; }
+
+      haptic('tap');
+
+      const payload = {
+        action: "otp_send",
+        email,
+        lang,
+        ts: new Date().toISOString(),
+        tg_user_id: tg?.initDataUnsafe?.user?.id || null
+      };
+
+      const out = await postToMake(payload);
+
+      if (out && out.ok) haptic('ok');
+      else haptic('err');
     });
 
-    document.getElementById('verifyBtn').addEventListener('click', () => {
-      // пока заглушка без текста внизу и без алертов
-      if (tg) tg.HapticFeedback?.notificationOccurred('success');
+    // Verify -> Make webhook
+    document.getElementById('verifyBtn').addEventListener('click', async () => {
+      const email = normalizeEmail(document.getElementById('email').value);
+      const code = normalizeCode(document.getElementById('code').value);
+
+      if (!email || !email.includes('@') || code.length !== 6) { haptic('err'); return; }
+
+      haptic('tap');
+
+      const payload = {
+        action: "otp_verify",
+        email,
+        code,
+        lang,
+        ts: new Date().toISOString(),
+        tg_user_id: tg?.initDataUnsafe?.user?.id || null
+      };
+
+      const out = await postToMake(payload);
+
+      if (out && out.ok) {
+        haptic('ok');
+
+        // optional: if Make returns a url to open
+        const url = out.open_url || out.url || null;
+        if (url) {
+          if (tg?.openLink) tg.openLink(url);
+          else window.location.href = url;
+        }
+        return;
+      }
+
+      haptic('err');
     });
 
     // default
