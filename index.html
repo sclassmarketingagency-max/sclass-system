@@ -75,6 +75,8 @@
       align-items:flex-start;
       gap:12px;
       margin-bottom:12px;
+      position:relative;
+      z-index:1;
     }
 
     h1{margin:0;font-size:34px;line-height:1.05}
@@ -87,12 +89,17 @@
       border:1px solid rgba(255,255,255,.35);
       backdrop-filter: blur(10px);
       font-size:12px;
+      white-space:nowrap;
+      position:relative;
+      z-index:1;
     }
 
     .langs{
       display:flex;
       gap:10px;
       margin:16px 0 18px;
+      position:relative;
+      z-index:1;
     }
 
     .langbtn{
@@ -102,8 +109,9 @@
       border:1px solid rgba(255,255,255,.35);
       background:rgba(255,255,255,.12);
       color:#fff;
-      font-weight:700;
+      font-weight:800;
       letter-spacing:.6px;
+      cursor:pointer;
     }
 
     .langbtn.active{
@@ -112,7 +120,7 @@
       border-color:rgba(236,212,189,.7);
     }
 
-    label{font-size:14px;margin-bottom:8px;display:block}
+    label{font-size:14px;margin-bottom:8px;display:block;position:relative;z-index:1}
 
     input{
       width:100%;
@@ -125,6 +133,8 @@
       font-size:16px;
       outline:none;
       backdrop-filter: blur(14px);
+      position:relative;
+      z-index:1;
     }
 
     input::placeholder{color:rgba(255,255,255,.45)}
@@ -134,7 +144,7 @@
       box-shadow:0 0 0 4px rgba(236,212,189,.18);
     }
 
-    .row{display:flex;gap:12px;margin:14px 0}
+    .row{display:flex;gap:12px;margin:14px 0;position:relative;z-index:1}
 
     .btn,.verify{
       height:52px;
@@ -142,16 +152,22 @@
       border:1px solid rgba(255,255,255,.35);
       background:linear-gradient(180deg,rgba(255,255,255,.25),rgba(255,255,255,.1));
       color:#fff;
-      font-weight:800;
+      font-weight:900;
       backdrop-filter: blur(14px);
       box-shadow:inset 0 1px 0 rgba(255,255,255,.45),0 10px 30px rgba(0,0,0,.35);
-      transition:transform .12s ease,box-shadow .12s ease;
+      transition:transform .12s ease,box-shadow .12s ease,opacity .12s ease;
       flex:1;
+      cursor:pointer;
     }
 
     .btn:active,.verify:active{
       transform:scale(.97);
       box-shadow:inset 0 2px 6px rgba(0,0,0,.35);
+    }
+
+    .btn[disabled], .verify[disabled]{
+      opacity:.55;
+      cursor:not-allowed;
     }
 
     .verify{
@@ -160,55 +176,324 @@
       border-color:rgba(236,212,189,.7);
       margin-top:10px;
       font-size:18px;
+      width:100%;
+      position:relative;
+      z-index:1;
     }
 
-    .hint{font-size:13px;color:rgba(255,255,255,.7);margin:10px 0}
+    .hint{font-size:13px;color:rgba(255,255,255,.7);margin:10px 0;position:relative;z-index:1}
+
+    .toast{
+      position:fixed;
+      left:50%;
+      bottom:22px;
+      transform:translateX(-50%);
+      background:rgba(0,0,0,.45);
+      border:1px solid rgba(255,255,255,.2);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      color:#fff;
+      padding:10px 12px;
+      border-radius:14px;
+      font-size:13px;
+      opacity:0;
+      pointer-events:none;
+      transition:opacity .2s ease, transform .2s ease;
+      z-index:9999;
+      max-width:min(520px,calc(100% - 24px));
+    }
+    .toast.show{
+      opacity:1;
+      transform:translateX(-50%) translateY(-6px);
+    }
   </style>
 </head>
 
 <body>
 <div class="wrap">
   <div class="card">
+
     <div class="toprow">
       <div>
-        <h1>Kirish</h1>
-        <div class="sub">S-Class ichki tizimi</div>
+        <h1 id="t_title">Kirish</h1>
+        <div class="sub" id="t_sub">S-Class ichki tizimi</div>
       </div>
       <div class="badge">Email OTP</div>
     </div>
 
-    <div class="langs">
-      <button class="langbtn active">UZ</button>
-      <button class="langbtn">EN</button>
-      <button class="langbtn">RU</button>
+    <div class="langs" role="tablist" aria-label="Language">
+      <button class="langbtn active" id="btnUZ" type="button">UZ</button>
+      <button class="langbtn" id="btnEN" type="button">EN</button>
+      <button class="langbtn" id="btnRU" type="button">RU</button>
     </div>
 
-    <label>Ishchi pochta</label>
-    <input type="email" placeholder="name@sclass.agency" />
+    <label id="t_email_label" for="email">Ishchi pochta</label>
+    <input id="email" type="email" placeholder="name@sclass.agency" autocomplete="email" inputmode="email" />
 
     <div class="row">
-      <button class="btn">Kod yuborish</button>
-      <button class="btn">Tozalash</button>
+      <button class="btn" id="sendBtn" type="button">Kod yuborish</button>
+      <button class="btn" id="clearBtn" type="button">Tozalash</button>
     </div>
 
-    <div class="hint">
+    <div class="hint" id="t_hint">
       Elektron pochtangizga 6 xonali kod yuboramiz. Kod ~10 daqiqa amal qiladi.
     </div>
 
-    <label>6 xonali kod</label>
-    <input type="text" placeholder="••••••" maxlength="6" />
+    <label id="t_code_label" for="code">6 xonali kod</label>
+    <input id="code" type="text" placeholder="••••••" maxlength="6" inputmode="numeric" />
 
-    <button class="verify">Tasdiqlash va ochish</button>
+    <button class="verify" id="verifyBtn" type="button">Tasdiqlash va ochish</button>
   </div>
 </div>
 
+<div class="toast" id="toast"></div>
+
 <script>
-  const tg = window.Telegram?.WebApp;
-  if(tg){
+  // === CONFIG ===
+  const MAKE_WEBHOOK_URL = "https://hook.eu1.make.com/ttfwxk8ddv8uip6c65f3vff94nazik87";
+
+  // Telegram init
+  const tg = window.Telegram?.WebApp || null;
+  if (tg) {
     tg.expand();
-    tg.setHeaderColor('#002b2e');
-    tg.setBackgroundColor('#002b2e');
+    tg.setHeaderColor?.('#002b2e');
+    tg.setBackgroundColor?.('#002b2e');
+    tg.ready?.();
   }
+
+  // i18n
+  const I18N = {
+    UZ: {
+      title: "Kirish",
+      sub: "S-Class ichki tizimi",
+      emailLabel: "Ishchi pochta",
+      send: "Kod yuborish",
+      clear: "Tozalash",
+      hint: "Elektron pochtangizga 6 xonali kod yuboramiz. Kod ~10 daqiqa amal qiladi.",
+      codeLabel: "6 xonali kod",
+      verify: "Tasdiqlash va ochish",
+      emailPh: "name@sclass.agency",
+      toastBadEmail: "Email noto‘g‘ri",
+      toastSent: "Kod yuborildi",
+      toastFail: "Xatolik. Qayta urinib ko‘ring",
+      toastBadCode: "Kod 6 xonali bo‘lsin",
+      toastVerified: "Tasdiqlandi"
+    },
+    EN: {
+      title: "Sign in",
+      sub: "S-Class internal system",
+      emailLabel: "Work email",
+      send: "Send code",
+      clear: "Clear",
+      hint: "We’ll send a 6-digit code to your email. Code is valid for ~10 minutes.",
+      codeLabel: "6-digit code",
+      verify: "Verify & Open",
+      emailPh: "name@sclass.agency",
+      toastBadEmail: "Invalid email",
+      toastSent: "Code sent",
+      toastFail: "Error. Try again",
+      toastBadCode: "Enter 6-digit code",
+      toastVerified: "Verified"
+    },
+    RU: {
+      title: "Вход",
+      sub: "Внутренняя система S-Class",
+      emailLabel: "Рабочая почта",
+      send: "Отправить код",
+      clear: "Очистить",
+      hint: "Мы отправим 6-значный код на вашу почту. Код действует ~10 минут.",
+      codeLabel: "6-значный код",
+      verify: "Проверить и открыть",
+      emailPh: "name@sclass.agency",
+      toastBadEmail: "Некорректный email",
+      toastSent: "Код отправлен",
+      toastFail: "Ошибка. Попробуйте снова",
+      toastBadCode: "Введите 6-значный код",
+      toastVerified: "Подтверждено"
+    }
+  };
+
+  let lang = "UZ";
+
+  // UI refs
+  const el = {
+    btnUZ: document.getElementById('btnUZ'),
+    btnEN: document.getElementById('btnEN'),
+    btnRU: document.getElementById('btnRU'),
+    t_title: document.getElementById('t_title'),
+    t_sub: document.getElementById('t_sub'),
+    t_email_label: document.getElementById('t_email_label'),
+    email: document.getElementById('email'),
+    sendBtn: document.getElementById('sendBtn'),
+    clearBtn: document.getElementById('clearBtn'),
+    t_hint: document.getElementById('t_hint'),
+    t_code_label: document.getElementById('t_code_label'),
+    code: document.getElementById('code'),
+    verifyBtn: document.getElementById('verifyBtn'),
+    toast: document.getElementById('toast')
+  };
+
+  // --- HAPTICS ---
+  function haptic(type){
+    if (!tg || !tg.HapticFeedback) return;
+    try{
+      if (type === 'ok') tg.HapticFeedback.notificationOccurred('success');
+      else if (type === 'err') tg.HapticFeedback.notificationOccurred('error');
+      else tg.HapticFeedback.impactOccurred('light');
+    }catch(e){}
+  }
+
+  // --- TOAST ---
+  let toastTimer = null;
+  function toast(msg){
+    el.toast.textContent = msg;
+    el.toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => el.toast.classList.remove('show'), 1600);
+  }
+
+  // --- Normalizers ---
+  function normalizeEmail(v){ return (v || "").trim().toLowerCase(); }
+  function normalizeCode(v){ return (v || "").replace(/\D/g,'').slice(0,6); }
+
+  // --- i18n apply ---
+  function setLang(newLang){
+    lang = newLang;
+
+    el.btnUZ.classList.toggle('active', lang === 'UZ');
+    el.btnEN.classList.toggle('active', lang === 'EN');
+    el.btnRU.classList.toggle('active', lang === 'RU');
+
+    const t = I18N[lang];
+    el.t_title.textContent = t.title;
+    el.t_sub.textContent = t.sub;
+    el.t_email_label.textContent = t.emailLabel;
+    el.sendBtn.textContent = t.send;
+    el.clearBtn.textContent = t.clear;
+    el.t_hint.textContent = t.hint;
+    el.t_code_label.textContent = t.codeLabel;
+    el.verifyBtn.textContent = t.verify;
+    el.email.placeholder = t.emailPh;
+
+    haptic('tap');
+  }
+
+  el.btnUZ.addEventListener('click', () => setLang('UZ'));
+  el.btnEN.addEventListener('click', () => setLang('EN'));
+  el.btnRU.addEventListener('click', () => setLang('RU'));
+
+  // --- POST to Make (оставляем webhook make.com) ---
+  async function postToMake(payload){
+    const res = await fetch(MAKE_WEBHOOK_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+
+    const text = await res.text();
+    try { return JSON.parse(text); }
+    catch { return { ok:false, raw:text }; }
+  }
+
+  // --- Buttons ---
+  el.clearBtn.addEventListener('click', () => {
+    el.email.value = '';
+    el.code.value = '';
+    haptic('tap');
+    toast(lang === 'RU' ? 'Очищено' : lang === 'EN' ? 'Cleared' : 'Tozalandi');
+  });
+
+  el.sendBtn.addEventListener('click', async () => {
+    const t = I18N[lang];
+    const email = normalizeEmail(el.email.value);
+
+    if (!email || !email.includes('@')) {
+      haptic('err');
+      toast(t.toastBadEmail);
+      return;
+    }
+
+    haptic('tap');
+    el.sendBtn.disabled = true;
+
+    const payload = {
+      action: "otp_send",
+      email,
+      lang,
+      ts: new Date().toISOString(),
+      tg_user_id: tg?.initDataUnsafe?.user?.id || null
+    };
+
+    const out = await postToMake(payload);
+
+    el.sendBtn.disabled = false;
+
+    if (out && out.ok) {
+      haptic('ok');
+      toast(t.toastSent);
+    } else {
+      haptic('err');
+      toast(t.toastFail);
+    }
+  });
+
+  el.verifyBtn.addEventListener('click', async () => {
+    const t = I18N[lang];
+    const email = normalizeEmail(el.email.value);
+    const code = normalizeCode(el.code.value);
+
+    if (!email || !email.includes('@')) {
+      haptic('err');
+      toast(t.toastBadEmail);
+      return;
+    }
+    if (code.length !== 6) {
+      haptic('err');
+      toast(t.toastBadCode);
+      return;
+    }
+
+    haptic('tap');
+    el.verifyBtn.disabled = true;
+
+    const payload = {
+      action: "otp_verify",
+      email,
+      code,
+      lang,
+      ts: new Date().toISOString(),
+      tg_user_id: tg?.initDataUnsafe?.user?.id || null
+    };
+
+    const out = await postToMake(payload);
+
+    el.verifyBtn.disabled = false;
+
+    if (out && out.ok) {
+      haptic('ok');
+      toast(t.toastVerified);
+
+      // optional open url from Make response
+      const url = out.open_url || out.url || null;
+      if (url) {
+        if (tg?.openLink) tg.openLink(url);
+        else window.location.href = url;
+      }
+      return;
+    }
+
+    haptic('err');
+    toast(t.toastFail);
+  });
+
+  // keep code numeric
+  el.code.addEventListener('input', () => {
+    const v = normalizeCode(el.code.value);
+    if (el.code.value !== v) el.code.value = v;
+  });
+
+  // default
+  setLang('UZ');
 </script>
 </body>
 </html>
