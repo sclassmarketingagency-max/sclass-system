@@ -1,209 +1,575 @@
-<!DOCTYPE html>
-<html lang="uz">
+<!doctype html>
+<html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Akrom Malik | Rasmiy Brend Platforma</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --glass: rgba(255, 255, 255, 0.03);
-            --border: rgba(255, 255, 255, 0.12);
-        }
-        body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background: radial-gradient(circle at 0% 0%, #1a1c2c 0%, #0d0e14 100%);
-            color: #fff;
-            overflow-x: hidden;
-        }
-        /* Эффект Liquid Glass */
-        .liquid-card {
-            background: var(--glass);
-            backdrop-filter: blur(25px) saturate(160%);
-            -webkit-backdrop-filter: blur(25px) saturate(160%);
-            border: 1px solid var(--border);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-        .liquid-card:hover {
-            border-color: rgba(255, 255, 255, 0.3);
-            transform: translateY(-5px);
-        }
-        /* Анимированный фон для Navoiyshunoslik */
-        .navoi-bg {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: url('https://www.transparenttextures.com/patterns/paper-fibers.png');
-            opacity: 0.05;
-            pointer-events: none;
-        }
-        .gradient-text {
-            background: linear-gradient(135deg, #fff 0%, #a5a5a5 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        /* Toast Notification */
-        #toast {
-            position: fixed; bottom: 2rem; right: 2rem;
-            transform: translateY(150%); transition: transform 0.3s ease;
-            z-index: 100;
-        }
-        #toast.show { transform: translateY(0); }
-    </style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>S-Class System</title>
+
+  <!-- Telegram WebApp SDK -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+  <style>
+    :root{
+      /* Immersive-like monochrome palette */
+      --bg0:#050506;
+      --bg1:#0b0b0d;
+      --bg2:#111116;
+
+      --text:#ffffff;
+      --muted:rgba(255,255,255,.72);
+      --muted2:rgba(255,255,255,.55);
+
+      /* Glass */
+      --glass:rgba(255,255,255,.06);
+      --glass2:rgba(255,255,255,.03);
+      --stroke:rgba(255,255,255,.12);
+      --stroke2:rgba(255,255,255,.18);
+
+      /* Accent in immersive style = white */
+      --accent:#ffffff;
+      --accentText:#0a0a0c;
+
+      /* Optional: Navoi background image (put your file here) */
+      --navoi-bg: none; /* example: url('/navoi/navoi-bg.webp') */
+    }
+
+    *{box-sizing:border-box}
+
+    body{
+      margin:0;
+      font-family: system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,Arial;
+      color:var(--text);
+
+      /* Immersive vibe: black + soft white blooms + optional Navoi layer */
+      background:
+        var(--navoi-bg) center/cover no-repeat,
+        radial-gradient(900px 600px at 12% -10%, rgba(255,255,255,.10), transparent 55%),
+        radial-gradient(800px 520px at 88% 8%, rgba(255,255,255,.07), transparent 58%),
+        radial-gradient(700px 520px at 50% 120%, rgba(255,255,255,.05), transparent 60%),
+        linear-gradient(180deg, var(--bg0), var(--bg1) 55%, var(--bg2));
+
+      min-height:100vh;
+      display:flex;
+      justify-content:center;
+      padding:22px 14px;
+      overflow-x:hidden;
+    }
+
+    /* Grain */
+    body::after{
+      content:"";
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      opacity:.075;
+      mix-blend-mode:overlay;
+      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='.55'/%3E%3C/svg%3E");
+      z-index:0;
+    }
+
+    .wrap{width:100%;max-width:520px; position:relative; z-index:1;}
+
+    /* === LIQUID GLASS CARD (Immersive cold glass) === */
+    .card{
+      position:relative;
+      background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.03));
+      border-radius:26px;
+      border:1px solid var(--stroke);
+      box-shadow:
+        0 28px 90px rgba(0,0,0,.65),
+        inset 0 1px 0 rgba(255,255,255,.12);
+      padding:20px;
+      backdrop-filter: blur(22px) saturate(130%);
+      -webkit-backdrop-filter: blur(22px) saturate(130%);
+      overflow:hidden;
+    }
+    .card::before{
+      content:"";
+      position:absolute;
+      inset:-40px -40px auto -40px;
+      height:220px;
+      background: radial-gradient(420px 140px at 18% 20%, rgba(255,255,255,.20), transparent 62%);
+      opacity:.55;
+      pointer-events:none;
+    }
+    .card::after{
+      content:"";
+      position:absolute;
+      inset:-1px;
+      border-radius:inherit;
+      background: linear-gradient(120deg, transparent 25%, rgba(255,255,255,.22), transparent 70%);
+      opacity:.18;
+      pointer-events:none;
+    }
+
+    .toprow{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:12px;
+      margin-bottom:12px;
+      position:relative;
+      z-index:1;
+    }
+
+    h1{margin:0;font-size:34px;line-height:1.05}
+    .sub{color:var(--muted);font-size:14px;margin-top:6px}
+
+    .badge{
+      padding:8px 12px;
+      border-radius:999px;
+      background:rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.18);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      font-size:12px;
+      white-space:nowrap;
+      position:relative;
+      z-index:1;
+      color:rgba(255,255,255,.75);
+    }
+
+    .langs{
+      display:flex;
+      gap:10px;
+      margin:16px 0 18px;
+      position:relative;
+      z-index:1;
+    }
+
+    .langbtn{
+      flex:1;
+      height:44px;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.18);
+      background:rgba(255,255,255,.06);
+      color:#fff;
+      font-weight:800;
+      letter-spacing:.6px;
+      cursor:pointer;
+      transition: background .15s ease, border-color .15s ease, transform .1s ease;
+    }
+    .langbtn:active{ transform: scale(.98); }
+
+    .langbtn.active{
+      background: var(--accent);
+      color: var(--accentText);
+      border-color: rgba(255,255,255,.55);
+    }
+
+    label{
+      font-size:14px;
+      margin-bottom:8px;
+      display:block;
+      position:relative;
+      z-index:1;
+      color:rgba(255,255,255,.82);
+    }
+
+    input{
+      width:100%;
+      height:54px;
+      border-radius:18px;
+      border:1px solid rgba(255,255,255,.18);
+      background:linear-gradient(180deg,rgba(255,255,255,.10),rgba(255,255,255,.04));
+      color:#fff;
+      padding:0 18px;
+      font-size:16px;
+      outline:none;
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      position:relative;
+      z-index:1;
+      transition: border-color .15s ease, box-shadow .15s ease;
+    }
+
+    input::placeholder{color:rgba(255,255,255,.45)}
+
+    input:focus{
+      border-color:rgba(255,255,255,.45);
+      box-shadow:0 0 0 4px rgba(255,255,255,.10);
+    }
+
+    .row{
+      display:flex;
+      gap:12px;
+      margin:14px 0;
+      position:relative;
+      z-index:1;
+    }
+
+    .btn,.verify{
+      height:52px;
+      border-radius:18px;
+      border:1px solid rgba(255,255,255,.18);
+      background:linear-gradient(180deg,rgba(255,255,255,.12),rgba(255,255,255,.05));
+      color:#fff;
+      font-weight:900;
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 10px 30px rgba(0,0,0,.45);
+      transition:transform .12s ease,box-shadow .12s ease,opacity .12s ease, background .12s ease;
+      flex:1;
+      cursor:pointer;
+    }
+
+    .btn:hover{ background:linear-gradient(180deg,rgba(255,255,255,.14),rgba(255,255,255,.06)); }
+
+    .btn:active,.verify:active{
+      transform:scale(.97);
+      box-shadow:inset 0 2px 6px rgba(0,0,0,.45);
+    }
+
+    .btn[disabled], .verify[disabled]{
+      opacity:.55;
+      cursor:not-allowed;
+    }
+
+    .verify{
+      background: var(--accent);
+      color: var(--accentText);
+      border-color: rgba(255,255,255,.55);
+      margin-top:10px;
+      font-size:18px;
+      width:100%;
+      position:relative;
+      z-index:1;
+    }
+    .verify:hover{ opacity:.92; }
+
+    .hint{
+      font-size:13px;
+      color:rgba(255,255,255,.65);
+      margin:10px 0;
+      position:relative;
+      z-index:1;
+    }
+
+    .toast{
+      position:fixed;
+      left:50%;
+      bottom:22px;
+      transform:translateX(-50%);
+      background:rgba(0,0,0,.55);
+      border:1px solid rgba(255,255,255,.18);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      color:#fff;
+      padding:10px 12px;
+      border-radius:14px;
+      font-size:13px;
+      opacity:0;
+      pointer-events:none;
+      transition:opacity .2s ease, transform .2s ease;
+      z-index:9999;
+      max-width:min(520px,calc(100% - 24px));
+    }
+    .toast.show{
+      opacity:1;
+      transform:translateX(-50%) translateY(-6px);
+    }
+
+    /* Optional vignette to keep text readable if Navoi bg is bright */
+    .vignette{
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      z-index:0;
+      background:
+        radial-gradient(1200px 700px at 50% 15%, rgba(0,0,0,.15), rgba(0,0,0,.68) 62%, rgba(0,0,0,.86)),
+        radial-gradient(800px 540px at 15% 85%, rgba(0,0,0,.35), rgba(0,0,0,.88));
+    }
+  </style>
 </head>
-<body class="selection:bg-blue-500/30">
 
-    <nav class="fixed top-6 left-1/2 -translate-x-1/2 z-[100] w-[90%] max-w-2xl">
-        <div class="liquid-card rounded-full px-6 py-3 flex items-center justify-between border-white/20">
-            <span class="font-extrabold tracking-tighter text-xl">AM</span>
-            <div class="hidden md:flex gap-6 text-[11px] uppercase tracking-widest font-semibold opacity-70">
-                <a href="#" class="hover:opacity-100 transition-opacity">Asosiy</a>
-                <a href="#catalog" class="hover:opacity-100 transition-opacity">Kutubxona</a>
-                <a href="#navoi" class="hover:opacity-100 transition-opacity text-yellow-500">Navoiy</a>
-            </div>
-            <button onclick="toggleAuth()" class="bg-white text-black px-5 py-2 rounded-full text-xs font-bold hover:scale-105 transition-transform">
-                Kirish
-            </button>
-        </div>
-    </nav>
+<body>
+<div class="vignette"></div>
 
-    <section class="relative pt-40 pb-20 px-6 text-center">
-        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[500px] bg-blue-600/10 blur-[120px] rounded-full -z-10"></div>
-        <h1 class="text-6xl md:text-8xl font-extrabold tracking-tighter mb-6 gradient-text">Akrom Malik</h1>
-        <p class="max-w-xl mx-auto text-lg opacity-50 font-light leading-relaxed mb-10">
-            "Ko'ngil asarlari, audio kitoblar va navoiyshunoslik olami." [cite: 42, 43]
-        </p>
-    </section>
+<div class="wrap">
+  <div class="card">
 
-    <div id="authModal" class="fixed inset-0 z-[110] hidden items-center justify-center p-6 backdrop-blur-md bg-black/40">
-        <div class="liquid-card w-full max-w-md p-10 rounded-[40px] relative">
-            <button onclick="toggleAuth()" class="absolute top-6 right-6 opacity-30">✕</button>
-            <h2 class="text-3xl font-bold mb-2">Xush kelibsiz</h2>
-            <p class="opacity-50 text-sm mb-8">Profilingizga kirish uchun elektron pochtangizni kiriting.</p>
-            
-            <input type="email" id="email" placeholder="Email (masalan: user@mail.com)" 
-                   class="w-full bg-white/5 border border-white/10 p-4 rounded-2xl mb-4 outline-none focus:border-blue-500/50 transition-colors">
-            
-            <div id="otpSection" class="hidden">
-                <input type="text" id="otp" placeholder="6 xonali kod" maxlength="6"
-                       class="w-full bg-white/5 border border-white/10 p-4 rounded-2xl mb-6 text-center text-2xl tracking-[1rem] outline-none">
-            </div>
-
-            <button id="mainBtn" onclick="handleAuth()" class="w-full bg-blue-600 py-4 rounded-2xl font-bold shadow-lg shadow-blue-600/20 hover:bg-blue-500 transition-colors">
-                Kod yuborish
-            </button>
-        </div>
+    <div class="toprow">
+      <div>
+        <h1 id="t_title">Kirish</h1>
+        <div class="sub" id="t_sub">S-Class ichki tizimi</div>
+      </div>
+      <div class="badge">Email OTP</div>
     </div>
 
-    <section id="catalog" class="max-w-7xl mx-auto px-6 py-20">
-        <div class="flex items-end justify-between mb-12">
-            <div>
-                <h2 class="text-4xl font-bold tracking-tight">Yangi asarlar</h2>
-                <p class="opacity-40">Raqamli kutubxona va audio streaming [cite: 7, 8]</p>
-            </div>
-            <a href="#" class="text-sm border-b border-white/20 pb-1 opacity-60">Hammasini ko'rish</a>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
-            <div class="liquid-card p-4 rounded-[45px]">
-                <div class="aspect-[3/4] rounded-[35px] overflow-hidden mb-6 relative">
-                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent z-10"></div>
-                    <img src="https://images.unsplash.com/photo-1543004218-ee141104638e?q=80&w=1000&auto=format&fit=crop" 
-                         alt="Book" class="w-full h-full object-cover">
-                    <div class="absolute bottom-6 left-6 z-20">
-                        <span class="bg-blue-600/80 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-bold uppercase">Yangi</span>
-                    </div>
-                </div>
-                <div class="px-2">
-                    <h3 class="text-xl font-bold mb-1">Halqa</h3>
-                    <p class="text-xs opacity-40 mb-6 uppercase tracking-widest">Digital PDF + Audio [cite: 217]</p>
-                    <div class="flex items-center justify-between">
-                        <span class="text-2xl font-extrabold text-blue-400">55 000 <span class="text-xs">UZS</span></span>
-                        <button class="bg-white/10 p-4 rounded-2xl hover:bg-white/20 transition-all">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                        </button>
-                    </div>
-                </div>
-            </div>
-            </div>
-    </section>
-
-    <section id="navoi" class="relative py-32 px-6 overflow-hidden">
-        <div class="navoi-bg"></div>
-        <div class="max-w-5xl mx-auto liquid-card p-12 md:p-20 rounded-[60px] border-yellow-500/20 text-center relative">
-            <div class="absolute -top-10 left-1/2 -translate-x-1/2 bg-yellow-500 text-black px-8 py-2 rounded-full font-bold text-xs uppercase tracking-widest shadow-xl">
-                Eksklyuziv
-            </div>
-            <h2 class="text-4xl md:text-6xl font-bold mb-8">Alisher Navoiy <br> <span class="text-yellow-500 opacity-80 italic">hikmatlari</span></h2>
-            <p class="text-lg opacity-60 font-light leading-relaxed mb-12">
-                "Navoiy navosi" turkumidagi maqolalar va asarlar tahlili. Faqat Premium obunachilar uchun[cite: 20, 22].
-            </p>
-            <button class="liquid-card px-10 py-5 rounded-3xl border-yellow-500/30 text-yellow-500 font-bold hover:bg-yellow-500 hover:text-black transition-all">
-                Bo'limga o'tish
-            </button>
-        </div>
-    </section>
-
-    <div id="toast" class="liquid-card px-6 py-4 rounded-3xl border-blue-500/30 flex items-center gap-4">
-        <div class="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></div>
-        <span id="toastMsg" class="text-sm font-medium">Xabar yuborildi</span>
+    <div class="langs" role="tablist" aria-label="Language">
+      <button class="langbtn active" id="btnUZ" type="button">UZ</button>
+      <button class="langbtn" id="btnEN" type="button">EN</button>
+      <button class="langbtn" id="btnRU" type="button">RU</button>
     </div>
 
-    <script>
-        const el = {
-            authModal: document.getElementById('authModal'),
-            otpSection: document.getElementById('otpSection'),
-            email: document.getElementById('email'),
-            mainBtn: document.getElementById('mainBtn'),
-            toast: document.getElementById('toast'),
-            toastMsg: document.getElementById('toastMsg')
-        };
+    <label id="t_email_label" for="email">Ishchi pochta</label>
+    <input id="email" type="email" placeholder="name@sclass.agency" autocomplete="email" inputmode="email" />
 
-        let isOtpSent = false;
+    <div class="row">
+      <button class="btn" id="sendBtn" type="button">Kod yuborish</button>
+      <button class="btn" id="clearBtn" type="button">Tozalash</button>
+    </div>
 
-        function toggleAuth() {
-            el.authModal.classList.toggle('hidden');
-            el.authModal.classList.toggle('flex');
-        }
+    <div class="hint" id="t_hint">
+      Elektron pochtangizga 6 xonali kod yuboramiz. Kod ~10 daqiqa amal qiladi.
+    </div>
 
-        function showToast(msg) {
-            el.toastMsg.innerText = msg;
-            el.toast.classList.add('show');
-            setTimeout(() => el.toast.classList.remove('show'), 3000);
-        }
+    <label id="t_code_label" for="code">6 xonali kod</label>
+    <input id="code" type="text" placeholder="••••••" maxlength="6" inputmode="numeric" />
 
-        async function handleAuth() {
-            if (!isOtpSent) {
-                // Имитация отправки OTP 
-                if (!el.email.value.includes('@')) {
-                    showToast("Email xato kiritildi");
-                    return;
-                }
-                el.mainBtn.innerText = "Yuklanmoqda...";
-                setTimeout(() => {
-                    isOtpSent = true;
-                    el.otpSection.classList.remove('hidden');
-                    el.mainBtn.innerText = "Tasdiqlash";
-                    el.mainBtn.classList.replace('bg-blue-600', 'bg-green-600');
-                    showToast("Kod pochtangizga yuborildi");
-                }, 1000);
-            } else {
-                // Имитация верификации
-                showToast("Muvaffaqiyatli kirdingiz!");
-                setTimeout(() => window.location.reload(), 1500);
-            }
-        }
+    <button class="verify" id="verifyBtn" type="button">Tasdiqlash va ochish</button>
+  </div>
+</div>
 
-        // Плавный скролл
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                document.querySelector(this.getAttribute('href')).scrollIntoView({
-                    behavior: 'smooth'
-                });
-            });
-        });
-    </script>
+<div class="toast" id="toast"></div>
+
+<script>
+  // === CONFIG ===
+  const MAKE_WEBHOOK_URL = "https://hook.eu1.make.com/ttfwxk8ddv8uip6c65f3vff94nazik87";
+
+  // Telegram init
+  const tg = window.Telegram?.WebApp || null;
+  if (tg) {
+    tg.expand();
+    tg.setHeaderColor?.('#0b0b0d');
+    tg.setBackgroundColor?.('#0b0b0d');
+    tg.ready?.();
+  }
+
+  // i18n
+  const I18N = {
+    UZ: {
+      title: "Kirish",
+      sub: "S-Class ichki tizimi",
+      emailLabel: "Ishchi pochta",
+      send: "Kod yuborish",
+      clear: "Tozalash",
+      hint: "Elektron pochtangizga 6 xonali kod yuboramiz. Kod ~10 daqiqa amal qiladi.",
+      codeLabel: "6 xonali kod",
+      verify: "Tasdiqlash va ochish",
+      emailPh: "name@sclass.agency",
+      toastBadEmail: "Email noto‘g‘ri",
+      toastSent: "Kod yuborildi",
+      toastFail: "Xatolik. Qayta urinib ko‘ring",
+      toastBadCode: "Kod 6 xonali bo‘lsin",
+      toastVerified: "Tasdiqlandi"
+    },
+    EN: {
+      title: "Sign in",
+      sub: "S-Class internal system",
+      emailLabel: "Work email",
+      send: "Send code",
+      clear: "Clear",
+      hint: "We’ll send a 6-digit code to your email. Code is valid for ~10 minutes.",
+      codeLabel: "6-digit code",
+      verify: "Verify & Open",
+      emailPh: "name@sclass.agency",
+      toastBadEmail: "Invalid email",
+      toastSent: "Code sent",
+      toastFail: "Error. Try again",
+      toastBadCode: "Enter 6-digit code",
+      toastVerified: "Verified"
+    },
+    RU: {
+      title: "Вход",
+      sub: "Внутренняя система S-Class",
+      emailLabel: "Рабочая почта",
+      send: "Отправить код",
+      clear: "Очистить",
+      hint: "Мы отправим 6-значный код на вашу почту. Код действует ~10 минут.",
+      codeLabel: "6-значный код",
+      verify: "Проверить и открыть",
+      emailPh: "name@sclass.agency",
+      toastBadEmail: "Некорректный email",
+      toastSent: "Код отправлен",
+      toastFail: "Ошибка. Попробуйте снова",
+      toastBadCode: "Введите 6-значный код",
+      toastVerified: "Подтверждено"
+    }
+  };
+
+  let lang = "UZ";
+
+  // UI refs
+  const el = {
+    btnUZ: document.getElementById('btnUZ'),
+    btnEN: document.getElementById('btnEN'),
+    btnRU: document.getElementById('btnRU'),
+    t_title: document.getElementById('t_title'),
+    t_sub: document.getElementById('t_sub'),
+    t_email_label: document.getElementById('t_email_label'),
+    email: document.getElementById('email'),
+    sendBtn: document.getElementById('sendBtn'),
+    clearBtn: document.getElementById('clearBtn'),
+    t_hint: document.getElementById('t_hint'),
+    t_code_label: document.getElementById('t_code_label'),
+    code: document.getElementById('code'),
+    verifyBtn: document.getElementById('verifyBtn'),
+    toast: document.getElementById('toast')
+  };
+
+  // --- HAPTICS ---
+  function haptic(type){
+    if (!tg || !tg.HapticFeedback) return;
+    try{
+      if (type === 'ok') tg.HapticFeedback.notificationOccurred('success');
+      else if (type === 'err') tg.HapticFeedback.notificationOccurred('error');
+      else tg.HapticFeedback.impactOccurred('light');
+    }catch(e){}
+  }
+
+  // --- TOAST ---
+  let toastTimer = null;
+  function toast(msg){
+    el.toast.textContent = msg;
+    el.toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => el.toast.classList.remove('show'), 1600);
+  }
+
+  // --- Normalizers ---
+  function normalizeEmail(v){ return (v || "").trim().toLowerCase(); }
+  function normalizeCode(v){ return (v || "").replace(/\\D/g,'').slice(0,6); }
+
+  // --- i18n apply ---
+  function setLang(newLang){
+    lang = newLang;
+
+    el.btnUZ.classList.toggle('active', lang === 'UZ');
+    el.btnEN.classList.toggle('active', lang === 'EN');
+    el.btnRU.classList.toggle('active', lang === 'RU');
+
+    const t = I18N[lang];
+    el.t_title.textContent = t.title;
+    el.t_sub.textContent = t.sub;
+    el.t_email_label.textContent = t.emailLabel;
+    el.sendBtn.textContent = t.send;
+    el.clearBtn.textContent = t.clear;
+    el.t_hint.textContent = t.hint;
+    el.t_code_label.textContent = t.codeLabel;
+    el.verifyBtn.textContent = t.verify;
+    el.email.placeholder = t.emailPh;
+
+    haptic('tap');
+  }
+
+  el.btnUZ.addEventListener('click', () => setLang('UZ'));
+  el.btnEN.addEventListener('click', () => setLang('EN'));
+  el.btnRU.addEventListener('click', () => setLang('RU'));
+
+  // --- helpers ---
+  function isValidEmail(v){
+    const email = normalizeEmail(v);
+    return /^[^\\s@]+@[^\\s@]+\\.[^\\s@]{2,}$/.test(email);
+  }
+
+  function getTelegramContext(){
+    if (!tg) return null;
+    const u = tg.initDataUnsafe?.user || null;
+    return {
+      tg_user_id: u?.id || null,
+      tg_username: u?.username || null,
+      tg_first_name: u?.first_name || null,
+      tg_last_name: u?.last_name || null,
+      initData: tg.initData || null
+    };
+  }
+
+  // --- actions ---
+  el.clearBtn.addEventListener('click', () => {
+    el.email.value = "";
+    el.code.value = "";
+    haptic('tap');
+    toast(I18N[lang].toastSent.replace("Kod yuborildi","Tozalandi").replace("Code sent","Cleared").replace("Код отправлен","Очищено"));
+  });
+
+  el.code.addEventListener('input', (e) => {
+    el.code.value = normalizeCode(el.code.value);
+  });
+
+  el.sendBtn.addEventListener('click', async () => {
+    const email = normalizeEmail(el.email.value);
+    if (!isValidEmail(email)){
+      haptic('err'); toast(I18N[lang].toastBadEmail); return;
+    }
+
+    el.sendBtn.disabled = true;
+    haptic('tap');
+
+    try{
+      const payload = {
+        action: "send_otp",
+        email,
+        lang,
+        ts: Date.now(),
+        telegram: getTelegramContext()
+      };
+
+      const res = await fetch(MAKE_WEBHOOK_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+
+      if (!res.ok) throw new Error("bad status");
+
+      haptic('ok');
+      toast(I18N[lang].toastSent);
+    }catch(err){
+      haptic('err');
+      toast(I18N[lang].toastFail);
+    }finally{
+      el.sendBtn.disabled = false;
+    }
+  });
+
+  el.verifyBtn.addEventListener('click', async () => {
+    const email = normalizeEmail(el.email.value);
+    const code = normalizeCode(el.code.value);
+
+    if (!isValidEmail(email)){
+      haptic('err'); toast(I18N[lang].toastBadEmail); return;
+    }
+    if (code.length !== 6){
+      haptic('err'); toast(I18N[lang].toastBadCode); return;
+    }
+
+    el.verifyBtn.disabled = true;
+    haptic('tap');
+
+    try{
+      const payload = {
+        action: "verify_otp",
+        email,
+        code,
+        lang,
+        ts: Date.now(),
+        telegram: getTelegramContext()
+      };
+
+      const res = await fetch(MAKE_WEBHOOK_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+
+      if (!res.ok) throw new Error("bad status");
+
+      haptic('ok');
+      toast(I18N[lang].toastVerified);
+
+      // OPTIONAL: close webapp or navigate
+      // tg?.close();
+    }catch(err){
+      haptic('err');
+      toast(I18N[lang].toastFail);
+    }finally{
+      el.verifyBtn.disabled = false;
+    }
+  });
+
+  // init
+  setLang('UZ');
+</script>
 </body>
 </html>
